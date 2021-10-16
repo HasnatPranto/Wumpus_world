@@ -27,6 +27,7 @@ hunter_pic_D =  pygame.transform.rotate(hunter_pic,270)
 hunter_pic_L =  pygame.transform.flip(hunter_pic,True,False)
 hunter_pic_U =  pygame.transform.rotate(hunter_pic,90)
 hunter_pic_R =  hunter_pic
+direction = "right"
 
 #board = [[]]
 board = np.empty(101, dtype=np.object)
@@ -218,7 +219,7 @@ def initializeBoard(screen):
     setPits(screen,pit_pic)
 
 def updateHunter(prev_pos, current_pos, screen):
-    global hunter_pic
+    global hunter_pic, direction
     if board[prev_pos].count(hunter_pos)>0:
         board[prev_pos].remove(hunter_pos)
     board[current_pos].append(hunter_pos)
@@ -226,12 +227,16 @@ def updateHunter(prev_pos, current_pos, screen):
     hunter_pic = pygame.transform.scale(hunter_pic, (58, 58))
     if prev_pos-current_pos==10:
         hunter_pic = hunter_pic_U
+        direction = "up"
     if prev_pos-current_pos==-1:
         hunter_pic = hunter_pic_L
+        direction = "left"
     if prev_pos-current_pos==1:
         hunter_pic = hunter_pic_R
+        direction = "right"
     if prev_pos-current_pos==-10:
         hunter_pic = hunter_pic_D
+        direction = "down"
     #screen.blit(hunter_pic, (52, 552))
     screen.blit(hunter_pic,((((current_pos%10) * 60 + 52), ((current_pos//10) * 60) + 12)))
     b = checkGameOver(current_pos)
@@ -263,10 +268,11 @@ def wumpus_isDead(screen):
     screen.blit(wum_pic, ((((wum_pos % 10) * 60 + 52), ((wum_pos // 10) * 60) + 12)))
 
 def doReset():
-    global wum_pic,hunter_pic,hunter_pic_R
+    global wum_pic,hunter_pic,hunter_pic_R,direction
     wum_pic = pygame.image.load("./UI/assets/wumpus.jpg")
     wum_pic = pygame.transform.scale(wum_pic, (58, 58))
     hunter_pic = hunter_pic_R
+    direction = "right"
     for i in range(0, 101):
         board[i] = []
         board[i].append(i)
