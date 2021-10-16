@@ -12,7 +12,7 @@ def setPic(wp,pp,tp,hp):
     pit_pic = pp
     treasure_pic = tp
     hunter_pic = hp
-
+deg = 0
 wum_pic = pygame.image.load("./UI/assets/wumpus.jpg")
 wum_pic = pygame.transform.scale(wum_pic, (58, 58))
 wumDead_pic = pygame.image.load("./UI/assets/dead_wumpus.png")
@@ -219,28 +219,48 @@ def initializeBoard(screen):
     setPits(screen,pit_pic)
 
 def updateHunter(prev_pos, current_pos, screen):
+
     global hunter_pic, direction
     if board[prev_pos].count(hunter_pos)>0:
         board[prev_pos].remove(hunter_pos)
     board[current_pos].append(hunter_pos)
     board[current_pos].append(safe)
-    hunter_pic = pygame.transform.scale(hunter_pic, (58, 58))
-    if prev_pos-current_pos==10:
-        hunter_pic = hunter_pic_U
-        direction = "up"
-    if prev_pos-current_pos==-1:
-        hunter_pic = hunter_pic_L
-        direction = "left"
-    if prev_pos-current_pos==1:
-        hunter_pic = hunter_pic_R
-        direction = "right"
-    if prev_pos-current_pos==-10:
-        hunter_pic = hunter_pic_D
-        direction = "down"
-    #screen.blit(hunter_pic, (52, 552))
+    
     screen.blit(hunter_pic,((((current_pos%10) * 60 + 52), ((current_pos//10) * 60) + 12)))
     b = checkGameOver(current_pos)
     return b
+
+def changeDir(screen, dir, current_pos):
+    global hunter_pic,deg
+    if dir == "left":
+        deg+=90
+        if deg == 180:
+            hunter_pic = hunter_pic_L
+        if deg == 270:
+            hunter_pic = hunter_pic_D
+        if deg == 90:
+            hunter_pic = hunter_pic_U
+        if deg ==360:
+            hunter_pic = hunter_pic_R
+
+        if deg == 360:
+            deg = 0
+
+    if dir == "right":
+        deg-=90
+        if deg == -90:
+            deg = 270
+        if deg == 180:
+            hunter_pic = hunter_pic_L
+        if deg == 270:
+            hunter_pic = hunter_pic_D
+        if deg == 90:
+            hunter_pic = hunter_pic_U
+        if deg ==0:
+            hunter_pic = hunter_pic_R
+
+    screen.blit(hunter_pic, ((((current_pos % 10) * 60 + 52), ((current_pos // 10) * 60) + 12)))
+    return deg
 
 def checkGameOver(current_pos):
     if any(wp in board[current_pos] for wp in ("wumpus","pit")):

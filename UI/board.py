@@ -1,7 +1,7 @@
 import pygame, sys
 import numpy as np
 
-from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead
+from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead, changeDir
 
 pygame.init()
 screenHeight = 650
@@ -19,6 +19,7 @@ X_COORD = 52
 Y_COORD = 552
 Hunter_POS = 90
 arrow = 1
+deg = 0
 
 begin_button = pygame.draw.rect(screen, (157, 252, 3), (790, 550, 70, 35));
 reset_button = pygame.draw.rect(screen, (252, 215, 3), (885, 550, 70, 35));
@@ -124,48 +125,55 @@ def gameOverDialogue(result):
 
 def init():
 
-    global X_COORD,Y_COORD,Hunter_POS,arrow
+    global X_COORD,Y_COORD,Hunter_POS,arrow,direction, deg
     originFill()
     initializeBoard(screen)
 
     while True:
         pygame.display.update()
         for event in pygame.event.get():
+
             pygame.display.update()
             if event.type == pygame.QUIT:
                 sys.exit(0)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    if Hunter_POS-10>=0:
-                        Hunter_POS-=10
-                        originFill()
-                        recreateEnv(screen)
-                        b = updateHunter(Hunter_POS+10,Hunter_POS,screen)
-                        if b !=None:
-                            gameOverDialogue(b)
 
-                if event.key == pygame.K_DOWN:
-                    if Hunter_POS+10<100:
-                        Hunter_POS+=10
-                        originFill()
-                        recreateEnv(screen)
-                        b = updateHunter(Hunter_POS-10,Hunter_POS,screen)
+                    if deg==0: #direction == "right":
+                        if Hunter_POS + 1 < 100:
+                            Hunter_POS += 1
+                            originFill()
+                            recreateEnv(screen)
+                            b = updateHunter(Hunter_POS + 1, Hunter_POS, screen)
+                    if deg == 180:#direction == "left":
+                        if Hunter_POS - 1 >= 0:
+                            Hunter_POS -= 1
+                            originFill()
+                            recreateEnv(screen)
+                            b = updateHunter(Hunter_POS - 1, Hunter_POS, screen)
+                    if deg == 90:#direction == "up":
+                        if Hunter_POS - 10 >= 0:
+                            Hunter_POS -= 10
+                            originFill()
+                            recreateEnv(screen)
+                            b = updateHunter(Hunter_POS + 10, Hunter_POS, screen)
+                            if b != None:
+                                gameOverDialogue(b)
+
+                    if deg == 270:#direction == "down":
+                        if Hunter_POS + 10 < 100:
+                            Hunter_POS += 10
+                            originFill()
+                            recreateEnv(screen)
+                            b = updateHunter(Hunter_POS - 10, Hunter_POS, screen)
 
                 if event.key == pygame.K_LEFT:
-                    if Hunter_POS-1>=0:
-                        Hunter_POS-=1
-                        originFill()
-                        recreateEnv(screen)
-                        b = updateHunter(Hunter_POS-1,Hunter_POS,screen)
+                    deg = changeDir(screen,"left",Hunter_POS)
 
                 if event.key == pygame.K_RIGHT:
-                    if Hunter_POS+1<100:
-                        Hunter_POS+=1
-                        originFill()
-                        recreateEnv(screen)
-                        b = updateHunter(Hunter_POS+1,Hunter_POS,screen)
-
+                    deg = changeDir(screen, "right", Hunter_POS)
+                    print(deg)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
 
