@@ -1,12 +1,13 @@
 import pygame, sys
 import numpy as np
 
-from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead, changeDir
+from Logic.logic import *
+from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead, changeDir, board
 
 pygame.init()
 screenHeight = 650
 screenWidth = 1100
-LgCOLR= (255,255,255)
+LgCOLR = (255, 255, 255)
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption('Wumpus World')
 wum_pic = pygame.image.load("./UI/assets/wumpus.jpg")
@@ -31,11 +32,10 @@ screen.blit(lbl_reset, (901, 557))
 
 
 def makeTiles():
-
     boxClr = (54, 40, 5)
     lineClr = (252, 59, 0)
 
-    pygame.draw.line(screen,boxClr,(50,10),(650,10),5)
+    pygame.draw.line(screen, boxClr, (50, 10), (650, 10), 5)
     pygame.draw.line(screen, boxClr, (50, 610), (650, 610), 5)
     pygame.draw.line(screen, boxClr, (50, 10), (50, 610), 5)
     pygame.draw.line(screen, boxClr, (650, 10), (650, 610), 5)
@@ -62,9 +62,9 @@ def makeTiles():
 
     pygame.display.update()
 
-def setLegends():
 
-    global wum_pic,hunter_pic,treasure_pic,pit_pic
+def setLegends():
+    global wum_pic, hunter_pic, treasure_pic, pit_pic
 
     wum_pic = pygame.transform.scale(wum_pic, (40, 40))
     hunter_pic = pygame.transform.scale(hunter_pic, (40, 40))
@@ -74,7 +74,7 @@ def setLegends():
     screen.blit(hunter_pic, (700, 55))
     screen.blit(treasure_pic, (700, 100))
     screen.blit(pit_pic, (700, 145))
-    pygame.draw.circle(screen, (232, 15, 0), (720,210), 10)
+    pygame.draw.circle(screen, (232, 15, 0), (720, 210), 10)
     pygame.draw.circle(screen, (252, 193, 1), (720, 240), 10)
     pygame.draw.circle(screen, (29, 182, 224), (720, 270), 10)
     pygame.draw.circle(screen, (66, 230, 7), (720, 300), 10)
@@ -101,13 +101,13 @@ def setLegends():
 
     pygame.draw.rect(screen, (0, 2, 18), [935, 15, 115, 40])
     font = pygame.font.SysFont('freesans', 20)
-    lbl_arrow = font.render('Arrow: ', True, (254,0,5))
+    lbl_arrow = font.render('Arrow: ', True, (254, 0, 5))
     lbl_acont = font.render(str(arrow), True, (254, 0, 5))
     screen.blit(lbl_arrow, (960, 22))
     screen.blit(lbl_acont, (1010, 22))
 
-def originFill():
 
+def originFill():
     screen.fill((5, 48, 0))
     pygame.draw.rect(screen, (1, 5, 0), [50, 10, 600, 600])
     begin_button = pygame.draw.rect(screen, (157, 252, 3), (790, 550, 70, 35));
@@ -120,14 +120,18 @@ def originFill():
 
     makeTiles()
     setLegends()
+
+
 def gameOverDialogue(result):
     pygame.draw.rect(screen, (1, 5, 0), [100, 300, 300, 100])
 
-def init():
 
-    global X_COORD,Y_COORD,Hunter_POS,arrow,direction, deg
+def init():
+    global X_COORD, Y_COORD, Hunter_POS, arrow, direction, deg
     originFill()
     initializeBoard(screen)
+
+    update_knowledge_base_with_current_position_info(board[90])
 
     while True:
         pygame.display.update()
@@ -140,19 +144,28 @@ def init():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
 
-                    if deg==0: #direction == "right":
+                    # direction == "right":
+                    if deg == 0:
                         if Hunter_POS + 1 < 100:
                             Hunter_POS += 1
                             originFill()
                             recreateEnv(screen)
                             b = updateHunter(Hunter_POS + 1, Hunter_POS, screen)
-                    if deg == 180:#direction == "left":
+
+                            # update_knowledge_base_with_current_position_info(str(Hunter_POS), board[Hunter_POS])
+
+                    # direction == "left":
+                    if deg == 180:
                         if Hunter_POS - 1 >= 0:
                             Hunter_POS -= 1
                             originFill()
                             recreateEnv(screen)
                             b = updateHunter(Hunter_POS - 1, Hunter_POS, screen)
-                    if deg == 90:#direction == "up":
+
+                            # update_knowledge_base_with_current_position_info(str(Hunter_POS), board[Hunter_POS])
+
+                    # direction == "up":
+                    if deg == 90:
                         if Hunter_POS - 10 >= 0:
                             Hunter_POS -= 10
                             originFill()
@@ -161,19 +174,24 @@ def init():
                             if b != None:
                                 gameOverDialogue(b)
 
-                    if deg == 270:#direction == "down":
+                            # update_knowledge_base_with_current_position_info(str(Hunter_POS), board[Hunter_POS])
+
+                    # direction == "down":
+                    if deg == 270:
                         if Hunter_POS + 10 < 100:
                             Hunter_POS += 10
                             originFill()
                             recreateEnv(screen)
                             b = updateHunter(Hunter_POS - 10, Hunter_POS, screen)
 
+                    update_knowledge_base_with_current_position_info(board[Hunter_POS])
+
                 if event.key == pygame.K_LEFT:
-                    deg = changeDir(screen,"left",Hunter_POS)
+                    deg = changeDir(screen, "left", Hunter_POS)
 
                 if event.key == pygame.K_RIGHT:
                     deg = changeDir(screen, "right", Hunter_POS)
-                    print(deg)
+                    # print(deg)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -190,7 +208,7 @@ def init():
 
                 if begin_button.collidepoint(click):
                     wumpus_isDead(screen)
-                    arrow-=1
+                    arrow -= 1
                     originFill()
                     recreateEnv(screen)
                     updateHunter(Hunter_POS, Hunter_POS, screen)
