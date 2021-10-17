@@ -128,7 +128,7 @@ def gameOverDialogue(result):
 def takeNextMove(newDirection,newPosition, move):
 
     global deg,Hunter_POS
-    rotation = abs(newDirection-deg)
+    rotation = abs(newDirection-deg)/90
 
     if (newDirection > deg):
         for i in range(0, rotation):
@@ -138,9 +138,9 @@ def takeNextMove(newDirection,newPosition, move):
             deg = changeDir(screen, "right", Hunter_POS)
 
     if move==True:
-        b = updateHunter(Hunter_POS, newPosition, screen)
         originFill()
         recreateEnv(screen)
+        b = updateHunter(Hunter_POS, newPosition, screen)
         Hunter_POS = newPosition
         update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
@@ -149,7 +149,7 @@ def init():
     global X_COORD, Y_COORD, Hunter_POS, arrow, direction, deg
     originFill()
     initializeBoard(screen)
-
+    initKB()
     update_knowledge_base_with_current_position_info(board[90])
 
     while True:
@@ -225,6 +225,7 @@ def init():
                     doReset()
                     originFill()
                     initializeBoard(screen)
+                    initKB()
 
                 if begin_button.collidepoint(click):
                     wumpus_isDead(screen)
