@@ -2,7 +2,8 @@ import pygame, sys
 import numpy as np
 
 from Logic.logic import *
-from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead, changeDir, board
+from UI.environment import initializeBoard, doReset, recreateEnv, updateHunter, wumpus_isDead, changeDir, board, \
+    checkGameOver
 
 pygame.init()
 screenHeight = 650
@@ -152,9 +153,9 @@ def init():
     initKB()
     update_knowledge_base_with_current_position_info(board[90])
 
-    while True:
-        pygame.display.update()
+    while not True:
 
+        pygame.display.update()
         for event in pygame.event.get():
 
             pygame.display.update()
@@ -206,6 +207,12 @@ def init():
 
                     update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
+                    gg = checkGameOver(Hunter_POS)
+                    if(gg=='dead'):
+                        lost = 1 #write your code here
+                    if(gg=='victory'):
+                        victory = 1 #write your code here
+
                 if event.key == pygame.K_LEFT:
                     deg = changeDir(screen, "left", Hunter_POS)
 
@@ -234,6 +241,7 @@ def init():
                     originFill()
                     recreateEnv(screen)
                     updateHunter(Hunter_POS, Hunter_POS, screen)
+                    gameOver = True
 
             '''if event.type ==pygame.MOUSEBUTTONDOWN:
                 coordX = event.pos[0]
