@@ -8,13 +8,13 @@ deg = 0
 wumpus_lock = 0
 treasure_lock = 0
 knowledge_base = {}
-visited_cells=[]
+visited_cells = []
 HVTSet1 = []
-HVTSet2 =[]
+HVTSet2 = []
 
 
 def initKB():
-    global knowledge_base, deg, current_hunter_position, visited_cells, HVT_lock,HVTSet1, HVTSet2, treasure_lock, wumpus_lock
+    global knowledge_base, deg, current_hunter_position, visited_cells, HVT_lock, HVTSet1, HVTSet2, treasure_lock, wumpus_lock
     current_hunter_position = None
     deg = 0
     treasure_lock = 0
@@ -36,6 +36,7 @@ def initKB():
         '90': [], '91': [], '92': [], '93': [], '94': [], '95': [], '96': [], '97': [], '98': [], '99': [],
     }
 
+
 # pit, wumpus, gold, visited, safe
 '''probable_knowledge_base = {
     '0': [], '1': [], '2': [], '3': [], '4': [], '5': [], '6': [], '7': [], '8': [], '9': [],
@@ -50,28 +51,26 @@ def initKB():
     '90': [], '91': [], '92': [], '93': [], '94': [], '95': [], '96': [], '97': [], '98': [], '99': [],
 }'''
 
+
 # visited cells
 
 
-
 def update_knowledge_base_with_current_position_info(info_list):
-
-    global  current_hunter_position# print(info_list)
+    global current_hunter_position  # print(info_list)
     global current_hunter_position
     prev_pos = current_hunter_position
     current_hunter_position = str(info_list[0])  # info_list[0] indicates location
     # print(current_hunter_position)
 
-    if knowledge_base[current_hunter_position].count('visited')==0:
+    if knowledge_base[current_hunter_position].count('visited') == 0:
         knowledge_base[current_hunter_position] = info_list[1:]
         knowledge_base[current_hunter_position].append('visited')
-        if prev_pos != None and knowledge_base[prev_pos].count('hunter')>0:
+        if prev_pos != None and knowledge_base[prev_pos].count('hunter') > 0:
             knowledge_base[prev_pos].remove('hunter')
         acquireKnowledge()
 
 
 def adjacent_cells(cell_position):
-
     cell_position = int(cell_position)
     if (cell_position + 1) < 100 and (cell_position + 1) % 10 != 0:
         right = (cell_position + 1)
@@ -84,12 +83,10 @@ def adjacent_cells(cell_position):
     lower = (cell_position + 10) if (cell_position + 10) < 100 else None
     upper = (cell_position - 10) if (cell_position) - 10 >= 0 else None
 
-
     return {'right': right, 'left': left, 'upper': upper, 'lower': lower}
 
 
 def acquireKnowledge():
-
     global current_hunter_position
     # print(knowledge_base[current_hunter_position])
     info = knowledge_base[current_hunter_position]
@@ -100,7 +97,7 @@ def acquireKnowledge():
 
         for value in list(safe_cells.values()):
             if value is not None:
-                #knowledge_base[str(value)].append('safe')
+                # knowledge_base[str(value)].append('safe')
                 if knowledge_base[str(value)].count('safe') == 0:
                     visited_cells.append(str(value))
                     knowledge_base[str(value)].append('safe')
@@ -118,7 +115,7 @@ def acquireKnowledge():
         cells = []
         for value in list(probable_wumpus_cells.values()):
             if value is not None:
-                if knowledge_base[str(value)].count('visited')==0:
+                if knowledge_base[str(value)].count('visited') == 0:
                     knowledge_base[str(value)].append('wumpus')
                     cells.append(value)
         pinpointHVT(cells, 'wum')
@@ -141,19 +138,19 @@ def acquireKnowledge():
 
         for value in list(probable_gold_cells.values()):
             if value is not None:
-                if knowledge_base[str(value)].count('visited')==0:
+                if knowledge_base[str(value)].count('visited') == 0:
                     knowledge_base[str(value)].append('treasure')
                     cells.append(value)
 
-        pinpointHVT(cells,'treasure')
+        pinpointHVT(cells, 'treasure')
     # if visited
     for cell in visited_cells:
         # remove possibility of pit
 
-        if knowledge_base[cell].count('pit')>0 and knowledge_base[cell].count('safe')>0:
+        if knowledge_base[cell].count('pit') > 0 and knowledge_base[cell].count('safe') > 0:
             knowledge_base[cell].remove('pit')
 
-        if knowledge_base[cell].count('wumpus')>0 and knowledge_base[cell].count('safe')>0:
+        if knowledge_base[cell].count('wumpus') > 0 and knowledge_base[cell].count('safe') > 0:
             knowledge_base[cell].remove('wumpus')
 
         '''if probable_knowledge_base[cell].count('pit') > 0:
@@ -162,6 +159,9 @@ def acquireKnowledge():
         if probable_knowledge_base[cell].count('wumpus') > 0:
             probable_knowledge_base[cell].remove('wumpus')'''
 
+    # for key, value in list(knowledge_base.keys()):
+    #     if value is not None:
+    #         print(key + '->' + value)
     print(knowledge_base)
     # print status
     '''for key, value in probable_knowledge_base.items():
@@ -169,13 +169,13 @@ def acquireKnowledge():
             print(str(key) + ': ' + str(value))'''
 
     print('#####')
-    #print(knowledge_base)
+    # print(knowledge_base)
 
-def pinpointHVT(hvtSet,mark):
 
-    global HVTSet1, HVTSet2, treasure_lock,wumpus_lock
+def pinpointHVT(hvtSet, mark):
+    global HVTSet1, HVTSet2, treasure_lock, wumpus_lock
 
-    if mark== 'treasure':
+    if mark == 'treasure':
         if treasure_lock == 0:
             HVTSet1 = hvtSet
             treasure_lock = 1
@@ -186,7 +186,7 @@ def pinpointHVT(hvtSet,mark):
             treasurePos = treasurePos.pop()
             print("treasure", treasurePos)
 
-    if mark== 'wum':
+    if mark == 'wum':
         if wumpus_lock == 0:
             HVTSet2 = hvtSet
             wumpus_lock = 1
