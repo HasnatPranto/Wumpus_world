@@ -49,18 +49,17 @@ def update_knowledge_base_with_current_position_info(info_list):
 
 
 def adjacent_cells():
-    if int(current_hunter_position) + 1 < 100 and int(current_hunter_position) + 1 % 10 != 0:
+    if int(current_hunter_position) + 1 < 100 and (int(current_hunter_position) + 1) % 10 != 0:
         right = int(current_hunter_position) + 1
     else:
         right = None
-    if int(current_hunter_position) - 1 >= 0 and int(current_hunter_position) - 1 % 10 != 9:
+    if int(current_hunter_position) - 1 >= 0 and (int(current_hunter_position) - 1) % 10 != 9:
         left = int(current_hunter_position) - 1
     else:
         left = None
     lower = int(current_hunter_position) + 10 if int(current_hunter_position) + 10 < 100 else None
     upper = int(current_hunter_position) - 10 if int(current_hunter_position) - 10 >= 0 else None
 
-    # 30, 28, 19, 39 - ekhane 30 keo adjacent boltese error here
 
     return {'right': right, 'left': left, 'upper': upper, 'lower': lower}
 
@@ -77,7 +76,7 @@ def next_move():
     # if stench
     if info.count('stench') > 0:
         probable_wumpus_cells = adjacent_cells()
-
+        print(adjacent_cells())
         for value in list(probable_wumpus_cells.values()):
             if value is not None:
                 if probable_knowledge_base[current_hunter_position].count('wumpus') == 0:
