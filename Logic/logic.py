@@ -4,7 +4,7 @@ Created on: 17/10/2021
 """
 
 current_hunter_position = None
-
+deg = 0
 knowledge_base = {
     '0': [], '1': [], '2': [], '3': [], '4': [], '5': [], '6': [], '7': [], '8': [], '9': [],
     '10': [], '11': [], '12': [], '13': [], '14': [], '15': [], '16': [], '17': [], '18': [], '19': [],
@@ -18,7 +18,7 @@ knowledge_base = {
     '90': [], '91': [], '92': [], '93': [], '94': [], '95': [], '96': [], '97': [], '98': [], '99': [],
 }
 
-# pit, wumpus, gold, visited
+# pit, wumpus, gold, visited, safe
 probable_knowledge_base = {
     '0': [], '1': [], '2': [], '3': [], '4': [], '5': [], '6': [], '7': [], '8': [], '9': [],
     '10': [], '11': [], '12': [], '13': [], '14': [], '15': [], '16': [], '17': [], '18': [], '19': [],
@@ -37,36 +37,51 @@ visited_cells = []
 
 
 def update_knowledge_base_with_current_position_info(info_list):
-    # print(info_list)
+    global  current_hunter_position# print(info_list)
     global current_hunter_position
     current_hunter_position = str(info_list[0])  # info_list[0] indicates location
     # print(current_hunter_position)
 
     if not knowledge_base[current_hunter_position]:
         knowledge_base[current_hunter_position] = info_list[1:]
+        knowledge_base[current_hunter_position].append('visited')
 
-    next_move()
+    acquireKnowledge()
 
 
-def adjacent_cells():
-    if int(current_hunter_position) + 1 < 100 and (int(current_hunter_position) + 1) % 10 != 0:
-        right = int(current_hunter_position) + 1
+def adjacent_cells(cell_position):
+    cell_position = int(cell_position)
+    if (cell_position + 1) < 100 and (cell_position + 1) % 10 != 0:
+        right = (cell_position + 1)
     else:
         right = None
-    if int(current_hunter_position) - 1 >= 0 and (int(current_hunter_position) - 1) % 10 != 9:
-        left = int(current_hunter_position) - 1
+    if (cell_position - 1) >= 0 and ((cell_position) - 1) % 10 != 9:
+        left = (cell_position) - 1
     else:
         left = None
-    lower = int(current_hunter_position) + 10 if int(current_hunter_position) + 10 < 100 else None
-    upper = int(current_hunter_position) - 10 if int(current_hunter_position) - 10 >= 0 else None
+    lower = (cell_position + 10) if (cell_position + 10) < 100 else None
+    upper = (cell_position - 10) if (cell_position) - 10 >= 0 else None
 
 
     return {'right': right, 'left': left, 'upper': upper, 'lower': lower}
 
 
-def next_move():
+def acquireKnowledge():
+
+    global current_hunter_position
     # print(knowledge_base[current_hunter_position])
     info = knowledge_base[current_hunter_position]
+
+    if all([info.count("breeze") == 0, info.count("stench") == 0]):
+
+        safe_cells = adjacent_cells(int(current_hunter_position))
+
+        for value in list(safe_cells.values()):
+            if value is not None:
+                print(value,type(value))
+                knowledge_base[str(value)].append('safe')
+                visited_cells.append(int(value))
+                probable_knowledge_base[str(value)].append('safe')
 
     # mark visited cells
     if probable_knowledge_base[current_hunter_position].count('visited') == 0:
@@ -75,8 +90,8 @@ def next_move():
 
     # if stench
     if info.count('stench') > 0:
-        probable_wumpus_cells = adjacent_cells()
-        print(adjacent_cells())
+        probable_wumpus_cells = adjacent_cells(current_hunter_position)
+
         for value in list(probable_wumpus_cells.values()):
             if value is not None:
                 if probable_knowledge_base[current_hunter_position].count('wumpus') == 0:
@@ -85,7 +100,11 @@ def next_move():
 
     # if breeze
     if info.count('breeze') > 0:
-        probable_pit_cells = adjacent_cells()
+        probable_pit_cells = adjacent_cells(current_hunter_position)
+
+        for value in list(probable_pit_cells.values()):
+            if value is not None:
+                probable_safe_cells = adjacent_cells(value)
 
         for value in list(probable_pit_cells.values()):
             if value is not None:
@@ -95,7 +114,7 @@ def next_move():
 
     # if glitter
     if info.count('glitter') > 0:
-        probable_gold_cells = adjacent_cells()
+        probable_gold_cells = adjacent_cells(current_hunter_position)
 
         for value in list(probable_gold_cells.values()):
             if value is not None:
@@ -105,15 +124,21 @@ def next_move():
     # if visited
     for cell in visited_cells:
         # remove possibility of pit
+
+        if probable_knowledge_base[cell].count('pit')>0 and knowledge_base[cell].count('safe')>0:
+            probable_knowledge_base[cell].remove('pit')
+
         if probable_knowledge_base[cell].count('pit') > 0:
             probable_knowledge_base[cell].remove('pit')
         # remove possibility of wumpus
         if probable_knowledge_base[cell].count('wumpus') > 0:
             probable_knowledge_base[cell].remove('wumpus')
 
+    print(probable_knowledge_base)
     # print status
-    for key, value in probable_knowledge_base.items():
+    '''for key, value in probable_knowledge_base.items():
         if value:
-            print(str(key) + ': ' + str(value))
+            print(str(key) + ': ' + str(value))'''
 
     print('#####')
+    #print(knowledge_base)
