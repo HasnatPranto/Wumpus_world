@@ -222,6 +222,7 @@ def init():
                     Y_COORD = 552
                     Hunter_POS = 90
                     arrow = 1
+                    deg=0
                     doReset()
                     originFill()
                     initializeBoard(screen)

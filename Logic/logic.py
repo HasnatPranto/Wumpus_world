@@ -5,13 +5,24 @@ Created on: 17/10/2021
 
 current_hunter_position = None
 deg = 0
+wumpus_lock = 0
+treasure_lock = 0
 knowledge_base = {}
-visited_cells =[]
+visited_cells=[]
+HVTSet1 = []
+HVTSet2 =[]
+
 
 def initKB():
+    global knowledge_base, deg, current_hunter_position, visited_cells, HVT_lock,HVTSet1, HVTSet2, treasure_lock, wumpus_lock
+    current_hunter_position = None
     deg = 0
+    treasure_lock = 0
+    wumpus_lock = 0
     visited_cells = []
-    global knowledge_base
+    HVTSet1 = []
+    HVTSet2 = []
+
     knowledge_base = {
         '0': [], '1': [], '2': [], '3': [], '4': [], '5': [], '6': [], '7': [], '8': [], '9': [],
         '10': [], '11': [], '12': [], '13': [], '14': [], '15': [], '16': [], '17': [], '18': [], '19': [],
@@ -104,12 +115,13 @@ def acquireKnowledge():
     # if stench
     if info.count('stench') > 0:
         probable_wumpus_cells = adjacent_cells(current_hunter_position)
-
+        cells = []
         for value in list(probable_wumpus_cells.values()):
             if value is not None:
-                if knowledge_base[current_hunter_position].count('wumpus') == 0:
-                    if knowledge_base[str(value)].count('wumpus') == 0:
-                        knowledge_base[str(value)].append('wumpus')
+                if knowledge_base[str(value)].count('visited')==0:
+                    knowledge_base[str(value)].append('wumpus')
+                    cells.append(value)
+        pinpointHVT(cells, 'wum')
 
     # if breeze
     if info.count('breeze') > 0:
@@ -123,13 +135,17 @@ def acquireKnowledge():
 
     # if glitter
     if info.count('glitter') > 0:
+        cells = []
+
         probable_gold_cells = adjacent_cells(current_hunter_position)
 
         for value in list(probable_gold_cells.values()):
             if value is not None:
-                if knowledge_base[str(value)].count('treasure') == 0 and knowledge_base[str(value)].count('visited')==0:
+                if knowledge_base[str(value)].count('visited')==0:
                     knowledge_base[str(value)].append('treasure')
+                    cells.append(value)
 
+        pinpointHVT(cells,'treasure')
     # if visited
     for cell in visited_cells:
         # remove possibility of pit
@@ -154,3 +170,29 @@ def acquireKnowledge():
 
     print('#####')
     #print(knowledge_base)
+
+def pinpointHVT(hvtSet,mark):
+
+    global HVTSet1, HVTSet2, treasure_lock,wumpus_lock
+
+    if mark== 'treasure':
+        if treasure_lock == 0:
+            HVTSet1 = hvtSet
+            treasure_lock = 1
+        else:
+            Set1 = set(HVTSet1)
+            Set2 = set(hvtSet)
+            treasurePos = Set1.intersection(Set2)
+            treasurePos = treasurePos.pop()
+            print("treasure", treasurePos)
+
+    if mark== 'wum':
+        if wumpus_lock == 0:
+            HVTSet2 = hvtSet
+            wumpus_lock = 1
+        else:
+            Set3 = set(HVTSet2)
+            Set4 = set(hvtSet)
+            wumPos = Set3.intersection(Set4)
+            wumPos = wumPos.pop()
+            print("wumpus", wumPos)
