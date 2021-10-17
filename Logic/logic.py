@@ -79,8 +79,8 @@ def acquireKnowledge():
         for value in list(safe_cells.values()):
             if value is not None:
                 print(value,type(value))
-                knowledge_base[str(value)].append('safe')
-                visited_cells.append(int(value))
+                #knowledge_base[str(value)].append('safe')
+                visited_cells.append(str(value))
                 probable_knowledge_base[str(value)].append('safe')
 
     # mark visited cells
@@ -104,10 +104,6 @@ def acquireKnowledge():
 
         for value in list(probable_pit_cells.values()):
             if value is not None:
-                probable_safe_cells = adjacent_cells(value)
-
-        for value in list(probable_pit_cells.values()):
-            if value is not None:
                 if probable_knowledge_base[current_hunter_position].count('pit') == 0:
                     if probable_knowledge_base[str(value)].count('pit') == 0:
                         probable_knowledge_base[str(value)].append('pit')
@@ -125,8 +121,11 @@ def acquireKnowledge():
     for cell in visited_cells:
         # remove possibility of pit
 
-        if probable_knowledge_base[cell].count('pit')>0 and knowledge_base[cell].count('safe')>0:
+        if probable_knowledge_base[cell].count('pit')>0 and probable_knowledge_base[cell].count('safe')>0:
             probable_knowledge_base[cell].remove('pit')
+
+        if probable_knowledge_base[cell].count('wumpus')>0 and probable_knowledge_base[cell].count('safe')>0:
+            probable_knowledge_base[cell].remove('wumpus')
 
         if probable_knowledge_base[cell].count('pit') > 0:
             probable_knowledge_base[cell].remove('pit')
