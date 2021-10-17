@@ -1,3 +1,5 @@
+import time
+
 import pygame, sys
 import numpy as np
 
@@ -22,6 +24,7 @@ Y_COORD = 552
 Hunter_POS = 90
 arrow = 1
 deg = 0
+begin = False
 
 begin_button = pygame.draw.rect(screen, (157, 252, 3), (790, 550, 70, 35));
 reset_button = pygame.draw.rect(screen, (252, 215, 3), (885, 550, 70, 35));
@@ -126,39 +129,61 @@ def originFill():
 def gameOverDialogue(result):
     pygame.draw.rect(screen, (1, 5, 0), [100, 300, 300, 100])
 
-def takeNextMove(newDirection,newPosition, move):
+def takeNextMove(newDirection,newPosition, move, shoot):
 
     global deg,Hunter_POS
-    rotation = abs(newDirection-deg)/90
+    rotation = int(abs(newDirection-deg)//90)
+    #print(rotation)
 
-    if (newDirection > deg):
+    if rotation == 4 or rotation == 0:
+       deg = deg
+
+    elif (newDirection > deg):
         for i in range(0, rotation):
             deg = changeDir(screen, "left", Hunter_POS)
+            pygame.display.update()
+            pygame.time.wait(200)
     elif (newDirection < deg):
         for i in range(0, rotation):
             deg = changeDir(screen, "right", Hunter_POS)
+            pygame.display.update()
+            pygame.time.wait(200)
 
     if move==True:
         originFill()
         recreateEnv(screen)
         b = updateHunter(Hunter_POS, newPosition, screen)
         Hunter_POS = newPosition
+        pygame.display.update()
         update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
+    if shoot == True:
+        arrow -= 1
+        originFill()
+        recreateEnv(screen)
+        wumpus_isDead(screen)
+        #updateHunter(Hunter_POS, Hunter_POS, screen)
+        pygame.display.update()
 
 def init():
-    global X_COORD, Y_COORD, Hunter_POS, arrow, direction, deg
+    global X_COORD, Y_COORD, Hunter_POS, arrow, direction, deg, begin
     originFill()
     initializeBoard(screen)
     initKB()
-    update_knowledge_base_with_current_position_info(board[90])
+    #update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
-    while not True:
+    while True:
+        if begin == True:
+            update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
         pygame.display.update()
         for event in pygame.event.get():
 
-            pygame.display.update()
+            '''if begin == True:
+                time.sleep(1)
+                print(Hunter_POS)
+                update_knowledge_base_with_current_position_info(board[Hunter_POS])'''
+           # pygame.display.update()
             if event.type == pygame.QUIT:
                 sys.exit(0)
 
@@ -205,7 +230,7 @@ def init():
                             recreateEnv(screen)
                             b = updateHunter(Hunter_POS - 10, Hunter_POS, screen)
 
-                    update_knowledge_base_with_current_position_info(board[Hunter_POS])
+                   # update_knowledge_base_with_current_position_info(board[Hunter_POS])
 
                     gg = checkGameOver(Hunter_POS)
                     if(gg=='dead'):
@@ -234,14 +259,16 @@ def init():
                     originFill()
                     initializeBoard(screen)
                     initKB()
+                    begin = False
 
                 if begin_button.collidepoint(click):
-                    wumpus_isDead(screen)
+                    begin = True
+                    update_knowledge_base_with_current_position_info(board[90])
+                    '''wumpus_isDead(screen)
                     arrow -= 1
                     originFill()
                     recreateEnv(screen)
-                    updateHunter(Hunter_POS, Hunter_POS, screen)
-                    gameOver = True
+                    updateHunter(Hunter_POS, Hunter_POS, screen)'''
 
             '''if event.type ==pygame.MOUSEBUTTONDOWN:
                 coordX = event.pos[0]

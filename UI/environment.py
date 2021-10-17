@@ -302,11 +302,12 @@ def wumpus_isDead(screen):
 
 
 def doReset():
-    global wum_pic, hunter_pic, hunter_pic_R, direction
+    global wum_pic, hunter_pic, hunter_pic_R, direction,deg
     wum_pic = pygame.image.load("./UI/assets/wumpus.jpg")
     wum_pic = pygame.transform.scale(wum_pic, (58, 58))
     hunter_pic = hunter_pic_R
     direction = "right"
+    deg = 0
     for i in range(0, 101):
         board[i] = []
         board[i].append(i)
