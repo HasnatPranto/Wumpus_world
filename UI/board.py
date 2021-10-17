@@ -125,6 +125,25 @@ def originFill():
 def gameOverDialogue(result):
     pygame.draw.rect(screen, (1, 5, 0), [100, 300, 300, 100])
 
+def takeNextMove(newDirection,newPosition, move):
+
+    global deg,Hunter_POS
+    rotation = abs(newDirection-deg)
+
+    if (newDirection > deg):
+        for i in range(0, rotation):
+            deg = changeDir(screen, "left", Hunter_POS)
+    elif (newDirection < deg):
+        for i in range(0, rotation):
+            deg = changeDir(screen, "right", Hunter_POS)
+
+    if move==True:
+        b = updateHunter(Hunter_POS, newPosition, screen)
+        originFill()
+        recreateEnv(screen)
+        Hunter_POS = newPosition
+        update_knowledge_base_with_current_position_info(board[Hunter_POS])
+
 
 def init():
     global X_COORD, Y_COORD, Hunter_POS, arrow, direction, deg
@@ -135,6 +154,7 @@ def init():
 
     while True:
         pygame.display.update()
+
         for event in pygame.event.get():
 
             pygame.display.update()
@@ -150,7 +170,7 @@ def init():
                             Hunter_POS += 1
                             originFill()
                             recreateEnv(screen)
-                            b = updateHunter(Hunter_POS + 1, Hunter_POS, screen)
+                            b = updateHunter(Hunter_POS - 1, Hunter_POS, screen)
 
                             # update_knowledge_base_with_current_position_info(str(Hunter_POS), board[Hunter_POS])
 
@@ -160,7 +180,7 @@ def init():
                             Hunter_POS -= 1
                             originFill()
                             recreateEnv(screen)
-                            b = updateHunter(Hunter_POS - 1, Hunter_POS, screen)
+                            b = updateHunter(Hunter_POS + 1, Hunter_POS, screen)
 
                             # update_knowledge_base_with_current_position_info(str(Hunter_POS), board[Hunter_POS])
 
